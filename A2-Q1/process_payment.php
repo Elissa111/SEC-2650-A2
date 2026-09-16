@@ -35,21 +35,33 @@ $amount = "2798.00";
                         
  <?php } elseif ($payment_method === "googlepay") {?>
 
- <?php } elseif ($payment_method === "mastercard") {?>
-<form action="process_card.php" method="post">
-<input type="hidden" name="payment_method" value="<?php echo $payment_method; ?>">
-<div> Name on the Card</div>
-<input type="text" name="card_name">
-<div> Card Number</div>
-<input type="text" name="card_numb">
-<div> Expiry Date</div>
-<input type="text" name="card_expiry" placeholder="MM/YY">
-<div> CVC </div>
-<input type="text" name="card_cvc" placeholder="123">
-<button type="submit">Pay Now</button>
-</form>
-      <?php } elseif ($payment_method === "visa") {?>
-
+      <?php } elseif ($payment_method === "visa" || $payment_method === "mastercard" || $payment_method === "americanexpress") {?>
+      <?php 
+		require_once '../vendor/autoload.php';
+		require_once '../secrets.php';
+		
+		$stripe = new \Stripe\StripeClient($stripeSecretKey);
+		
+		$YOUR_DOMAIN = 'http://localhost/A2-Q1';
+		
+		$checkout_session = $stripe->checkout->sessions->create([
+		  'line_items' => [[
+		  'price_data' => [													
+	      'currency' => 'aud',
+          'product_data' => [
+          'name' => $item_name
+      ],
+      'unit_amount' => (int)($amount * 100),
+    ],
+		    'quantity' => 1,
+		  ]],
+		  'mode' => 'payment',
+		  'success_url' => $YOUR_DOMAIN . '/success.php?session_id={CHECKOUT_SESSION_ID}',
+		]);
+		
+		header("HTTP/1.1 303 See Other");
+		header("Location: " . $checkout_session->url);
+		?>
      <?php }?>
      </body>
      </html>
