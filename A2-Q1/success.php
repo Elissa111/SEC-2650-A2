@@ -1,6 +1,7 @@
 <?php
 
 // If transaction data is available in the URL 
+
 if(!empty($_GET['tx']) 
 && !empty($_GET['amt']) && !empty($_GET['cc']) 
 && !empty($_GET['st'])){ 
@@ -12,7 +13,22 @@ if(!empty($_GET['tx'])
 
 		$product_name = "Electric Bike Model 1, Electric Bike Model 2";
         $product_price = "2798.00";
-	}
+	} else if (!empty($_GET['session_id'])) {
+    require_once 'stripe-php-master/init.php';
+    require_once 'secrets.php';
+
+    $stripe = new \Stripe\StripeClient($stripeSecretKey);
+    $checkout_session = $stripe->checkout->sessions->retrieve($_GET['session_id']);
+
+    if ($checkout_session->status === 'complete') {
+        $txn_id = $checkout_session->id;
+        $payment_gross = $checkout_session->amount_total / 100;
+        $currency_code = $checkout_session->currency;
+        $payment_status = "Completed";
+		$product_name = "Electric Bike Model 1, Electric Bike Model 2";
+        $product_price = "2798.00";
+    }
+}
 ?>
 
 <!DOCTYPE html>
