@@ -37,8 +37,8 @@ $amount = "2798.00";
 
       <?php } elseif ($payment_method === "visa" || $payment_method === "mastercard" || $payment_method === "americanexpress") {?>
       <?php 
-		require_once '../vendor/autoload.php';
-		require_once '../secrets.php';
+		require_once 'stripe-php-master/init.php';
+		require_once 'secrets.php';
 		
 		$stripe = new \Stripe\StripeClient($stripeSecretKey);
 		
